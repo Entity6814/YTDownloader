@@ -195,6 +195,19 @@ class HeadlessDownloaderApp(QObject):
                         'release_url': release_url
                     }
                     
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                print("ℹ️ No releases found on GitHub (this is normal for new projects)")
+                return {
+                    'update_available': False,
+                    'current_version': CURRENT_VERSION,
+                    'latest_version': CURRENT_VERSION,
+                    'release_url': f"https://github.com/{GITHUB_REPO}/releases",
+                    'no_releases': True
+                }
+            else:
+                print(f"❌ HTTP error checking for updates: {e}")
+                return {'update_available': False, 'error': f"HTTP {e.code}: {e.reason}"}
         except urllib.error.URLError as e:
             print(f"❌ Network error checking for updates: {e}")
             return {'update_available': False, 'error': str(e)}
@@ -207,11 +220,21 @@ class HeadlessDownloaderApp(QObject):
         update_info = self.check_for_updates()
         
         if update_info.get('error'):
-            self.show_error_dialog("Update Check Failed", 
+            self.show_error_dialog("Update Check Failed",
                 f"Could not check for updates: {update_info['error']}")
             return
         
-        if update_info['update_available']:
+        if update_info.get('no_releases'):
+            message = f"""
+            <h3>No Releases Yet</h3>
+            <p><b>Current Version:</b> {update_info['current_version']}</p>
+            <p>There are no official releases on GitHub yet.</p>
+            <p>You can still download the latest code from the main branch.</p>
+            <hr>
+            <p><a href="{update_info['release_url']}">View GitHub Releases</a></p>
+            """
+            self.show_info_dialog("No Releases", message)
+        elif update_info['update_available']:
             message = f"""
             <h3>Update Available!</h3>
             <p><b>Current Version:</b> {update_info['current_version']}</p>
