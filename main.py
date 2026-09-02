@@ -4,6 +4,8 @@ import threading
 import json
 import os
 import time
+import urllib.request
+import urllib.error
 
 # Import only ONE PyQt variant based on dependency check results
 # This prevents double dialogs from both PyQt5 and PyQt6
@@ -32,12 +34,12 @@ except Exception as e:
 # Import ONLY the detected PyQt variant
 if PYQT_VARIANT == 'PyQt5':
     from PyQt5.QtCore import QObject, pyqtSlot, Qt
-    from PyQt5.QtWidgets import QApplication, QFileDialog, QSystemTrayIcon, QMenu, QAction, QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QGroupBox, QMessageBox
+    from PyQt5.QtWidgets import QApplication, QFileDialog, QSystemTrayIcon, QMenu, QAction, QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QGroupBox, QMessageBox, QDialog
     from PyQt5.QtGui import QIcon, QCursor
     PYQT_VERSION = 5
 else:  # PyQt6
     from PyQt6.QtCore import QObject, pyqtSlot, Qt
-    from PyQt6.QtWidgets import QApplication, QFileDialog, QSystemTrayIcon, QMenu, QAction, QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QGroupBox, QMessageBox
+    from PyQt6.QtWidgets import QApplication, QFileDialog, QSystemTrayIcon, QMenu, QAction, QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QGroupBox, QMessageBox, QDialog
     from PyQt6.QtGui import QIcon, QCursor
     PYQT_VERSION = 6
 
@@ -55,6 +57,11 @@ from downloader import DownloadWorker, WorkerSignals
 from api_server import LocalApiServer
 from scheduler import PlaylistScheduler
 from settings import resolve_js_runtime, load_settings
+
+# Version information
+CURRENT_VERSION = "1.0.0"
+GITHUB_REPO = "Entity6814/YTDownloader"
+GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
 # Run dependency check on startup
 try:
@@ -153,6 +160,98 @@ class HeadlessDownloaderApp(QObject):
         print("🚪 Quitting application from system tray...")
         self.shutdown()
         QApplication.quit()
+
+    def check_for_updates(self):
+        """Check for updates from GitHub releases."""
+        print("🔄 Checking for updates...")
+        try:
+            request = urllib.request.Request(
+                GITHUB_API_URL,
+                headers={'User-Agent': 'YouTubeDesktopDownloader'}
+            )
+            
+            with urllib.request.urlopen(request, timeout=10) as response:
+                data = json.loads(response.read().decode('utf-8'))
+                latest_version = data.get('tag_name', '').replace('v', '')
+                release_url = data.get('html_url', '')
+                
+                print(f"📦 Current version: {CURRENT_VERSION}")
+                print(f"📦 Latest version: {latest_version}")
+                
+                if latest_version != CURRENT_VERSION:
+                    print(f"✨ New version available: {latest_version}")
+                    return {
+                        'update_available': True,
+                        'current_version': CURRENT_VERSION,
+                        'latest_version': latest_version,
+                        'release_url': release_url
+                    }
+                else:
+                    print("✅ You are using the latest version")
+                    return {
+                        'update_available': False,
+                        'current_version': CURRENT_VERSION,
+                        'latest_version': latest_version,
+                        'release_url': release_url
+                    }
+                    
+        except urllib.error.URLError as e:
+            print(f"❌ Network error checking for updates: {e}")
+            return {'update_available': False, 'error': str(e)}
+        except Exception as e:
+            print(f"❌ Error checking for updates: {e}")
+            return {'update_available': False, 'error': str(e)}
+
+    def show_update_dialog(self):
+        """Show update dialog with update information."""
+        update_info = self.check_for_updates()
+        
+        if update_info.get('error'):
+            self.show_error_dialog("Update Check Failed", 
+                f"Could not check for updates: {update_info['error']}")
+            return
+        
+        if update_info['update_available']:
+            message = f"""
+            <h3>Update Available!</h3>
+            <p><b>Current Version:</b> {update_info['current_version']}</p>
+            <p><b>Latest Version:</b> {update_info['latest_version']}</p>
+            <p><b>Release Notes:</b> <a href="{update_info['release_url']}">View on GitHub</a></p>
+            <hr>
+            <p><b>To update:</b></p>
+            <ol>
+                <li>Go to: <a href="{update_info['release_url']}">GitHub Releases</a></li>
+                <li>Download the latest version</li>
+                <li>Replace your current files with the new ones</li>
+                <li>Run: <code>pip install -r requirements.txt</code></li>
+                <li>Run: <code>python check.py</code></li>
+            </ol>
+            """
+            self.show_info_dialog("Update Available", message)
+        else:
+            message = f"""
+            <h3>No Updates Available</h3>
+            <p><b>Current Version:</b> {update_info['current_version']}</p>
+            <p><b>Latest Version:</b> {update_info['latest_version']}</p>
+            <p>You are using the latest version of YouTube Desktop Downloader Bridge Pro!</p>
+            """
+            self.show_info_dialog("Up to Date", message)
+
+    def show_error_dialog(self, title, message):
+        """Show error dialog."""
+        if PYQT_VERSION == 5:
+            from PyQt5.QtWidgets import QMessageBox
+        else:
+            from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.critical(None, title, message)
+
+    def show_info_dialog(self, title, message):
+        """Show info dialog."""
+        if PYQT_VERSION == 5:
+            from PyQt5.QtWidgets import QMessageBox
+        else:
+            from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(None, title, message)
 
     def shutdown(self):
         print("Shutting down background service threads...")
@@ -543,6 +642,13 @@ class HeadlessDownloaderApp(QObject):
         
         self.tray_menu.addSeparator()
         
+        # Check for updates action
+        update_action = QAction("🔄 Check for Updates", self.tray_menu)
+        update_action.triggered.connect(self.show_update_dialog)
+        self.tray_menu.addAction(update_action)
+        
+        self.tray_menu.addSeparator()
+        
         # Exit action
         exit_action = QAction("🚪 Exit", self.tray_menu)
         exit_action.triggered.connect(self.quit_application)
@@ -702,10 +808,10 @@ class HeadlessDownloaderApp(QObject):
             self.show_about_dialog()
 
     def show_about_dialog(self):
-        """Show about dialog with creator information."""
-        about_text = """
+        """Show about dialog with creator information and update button."""
+        about_text = f"""
         <h3>YouTube Desktop Downloader Bridge Pro</h3>
-        <p><b>Version:</b> 1.0.0</p>
+        <p><b>Version:</b> {CURRENT_VERSION}</p>
         <p><b>Creator:</b> Entity6814 (Vatsal Patel)</p>
         <p><b>License:</b> MIT License</p>
         <p><b>GitHub:</b> https://github.com/Entity6814/YTDownloader</p>
@@ -729,7 +835,29 @@ class HeadlessDownloaderApp(QObject):
         • Flask team for the web server framework</p>
         """
         
-        QMessageBox.about(None, "About YouTube Desktop Downloader", about_text)
+        dialog = QDialog()
+        dialog.setWindowTitle("About YouTube Desktop Downloader")
+        dialog.setMinimumWidth(450)
+        
+        layout = QVBoxLayout()
+        
+        info_label = QLabel(about_text)
+        info_label.setWordWrap(True)
+        info_label.setTextFormat(Qt.RichText)
+        layout.addWidget(info_label)
+        
+        # Add update button
+        update_button = QPushButton("🔄 Check for Updates")
+        update_button.clicked.connect(lambda: [dialog.close(), self.show_update_dialog()])
+        layout.addWidget(update_button)
+        
+        # Add close button
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(dialog.close)
+        layout.addWidget(close_button)
+        
+        dialog.setLayout(layout)
+        dialog.exec_()
 
 class EmbeddedVideoWindow(QWidget):
     """PyQt window for embedded YouTube video download options."""
