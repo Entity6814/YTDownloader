@@ -17,9 +17,14 @@ A fully browser-based headless YouTube downloader with advanced format selection
 - **Auto Format Configuration**: Smart recode automatically switches output format based on selection
 - **Stream Sorting**: Sort streams by quality, format ID, or default order
 - **Progress Tracking**: Real-time download progress with speed and ETA display
-- **Playlist Matrix**: Advanced playlist customization with per-video quality overrides
 - **Movable Browser HUD**: Drag the downloader panel anywhere and keep its position across restarts
 - **Hide/Restore Flow**: Hide the panel with the close button and bring it back from the OrangeMonkey script menu
+- **Download History**: Track all download attempts with timestamps and success/failure status
+- **Download Statistics**: Monitor total downloads, success rate, and data downloaded
+- **Queue Management**: View and reorder download queue with drag-and-drop interface
+- **Metadata Caching**: Smart caching system for video and playlist metadata with configurable expiry
+- **Version Checking**: Built-in GitHub API integration to check for application updates
+- **Update System**: Direct access to check for updates from system tray and about dialog
 
 ### Advanced Features
 - **Basic/Advanced Mode Toggle**: Switch between simple and advanced UI modes
@@ -37,8 +42,10 @@ A fully browser-based headless YouTube downloader with advanced format selection
   - Visual indicator shows current mode
 - **Custom Tray Icon**: Upload custom icons for the system tray (supports PNG, JPG, JPEG, ICO, BMP, SVG)
 - **System Tray Integration**: System tray icon with real-time download status and queue information
+- **Version Checking**: Built-in GitHub API integration to check for updates
+- **Update Button**: Direct access to check for updates from system tray and about dialog
 - **PyQt6 Support**: Automatic PyQt5/PyQt6 compatibility checking with fallback support
-- **Dependency Checker**: Built-in dependency verification with PyQt compatibility testing
+- **Dependency Checker**: Built-in dependency verification with PyQt compatibility testing and auto-update
 
 ### Technical Features
 - **Custom Format Matching**: Bypasses yt-dlp's inconsistent format selection with per-video analysis
@@ -46,6 +53,9 @@ A fully browser-based headless YouTube downloader with advanced format selection
 - **Codec Preference**: Prioritizes AAC over Opus for audio quality
 - **Error Handling**: Robust error handling with timeout and retry logic
 - **Thread-Safe State Management**: Synchronized job tracking across threads
+- **PO Token Support**: Dual PO token libraries (yt-dlp-getpot-wpc, yt-dlp-ejs) for YouTube anti-bot measures
+- **JavaScript Runtime Integration**: Automatic Deno/Node.js detection and configuration for yt-dlp
+- **Auto-Retry System**: Configurable automatic retry for failed downloads with delay settings
 
 ## Setup
 
@@ -55,6 +65,7 @@ A fully browser-based headless YouTube downloader with advanced format selection
 - Flask
 - yt-dlp
 - yt-dlp-getpot-wpc (for PO token support)
+- yt-dlp-ejs (alternate PO token support)
 - A JavaScript runtime for yt-dlp: Deno preferred, Node.js as fallback
 - OrangeMonkey Pro browser extension (recommended)
 
@@ -153,10 +164,11 @@ python main.py
    - Save the downloader panel position and visibility state
 
 4. **System Tray Features**
-   - **Left-click on tray icon**: Shows about dialog with creator info
+   - **Left-click on tray icon**: Shows about dialog with creator info and update button
    - **Right-click on tray icon**: Shows context menu with:
      - Current download status
      - Queue information
+     - Check for Updates option
      - Exit option
 
 ## Quick Commands Reference
@@ -201,7 +213,109 @@ pip install --upgrade yt-dlp
 
 4. **Click "Download"** to start the download
 
-### Advanced Usage
+### History, Statistics, and Queue Management
+
+#### Download History
+- Click the "📜 History" button in the advanced mode console
+- View all past downloads with timestamps and success/failure status
+- Clear download history with one click
+- History is stored in JSON format with automatic management
+
+#### Download Statistics  
+- Click the "📊 Statistics" button in the advanced mode console
+- View comprehensive download statistics:
+  - Total downloads count
+  - Successful downloads count
+  - Failed downloads count
+  - Success rate percentage
+  - Total data downloaded
+  - Last updated timestamp
+- Statistics help track your download performance and identify issues
+
+#### Queue Manager
+- Click the "📋 Queue" button in the advanced mode console
+- View current download queue with all jobs
+- Drag and drop to reorder download priority
+- Save new queue order with one click
+- Real-time queue status updates
+- View individual job status (queued, downloading, completed, etc.)
+
+### History, Statistics, and Queue Management
+
+#### Download History
+- Click the "📜 History" button in the advanced mode console
+- View all past downloads with timestamps and success/failure status
+- Clear download history with one click
+- History is stored in JSON format with automatic management
+
+#### Download Statistics  
+- Click the "📊 Statistics" button in the advanced mode console
+- View comprehensive download statistics:
+  - Total downloads count
+  - Successful downloads count
+  - Failed downloads count
+  - Success rate percentage
+  - Total data downloaded
+  - Last updated timestamp
+- Statistics help track your download performance and identify issues
+
+#### Queue Manager
+- Click the "📋 Queue" button in the advanced mode console
+- View current download queue with all jobs
+- Drag and drop to reorder download priority
+- Save new queue order with one click
+- Real-time queue status updates
+- View individual job status (queued, downloading, completed, etc.)
+
+### Caching System
+
+The application includes a smart metadata caching system to improve performance:
+
+#### Features
+- **Video Caching**: Caches individual video metadata to reduce API calls
+- **Playlist Caching**: Caches entire playlist metadata for faster access
+- **Configurable Expiry**: Set cache expiry time (in days) or disable expiry
+- **Auto Cleanup**: Automatic removal of expired cache entries
+- **Manual Controls**: Clear cache manually or clean up expired entries
+
+#### Cache Settings
+Access cache settings through the API:
+- Set cache expiry days (null = no expiry)
+- Clear all cached metadata
+- Clean up expired entries only
+
+#### Cache Benefits
+- Faster subsequent access to previously viewed videos/playlists
+- Reduced load on YouTube servers
+- Improved performance for large playlists
+- Configurable memory usage with expiry settings
+
+### Update System
+
+The application includes built-in version checking and update functionality:
+
+#### Version Checking
+- **Automatic GitHub API Integration**: Checks for latest releases on GitHub
+- **Version Comparison**: Compares current version with latest release
+- **Network Error Handling**: Graceful failure if no internet connection
+- **User-Friendly Dialogs**: Clear update status and instructions
+
+#### Update Access Points
+- **System Tray Menu**: Right-click tray icon → "🔄 Check for Updates"
+- **About Dialog**: Click tray icon → "🔄 Check for Updates" button
+- **Update Instructions**: Direct links to GitHub releases with step-by-step guide
+
+#### Update Process
+When updates are available:
+1. Click "Check for Updates" from tray menu or about dialog
+2. App queries GitHub API for latest release
+3. If new version available, shows update dialog with:
+   - Current version and latest version
+   - Link to GitHub releases page
+   - Step-by-step update instructions
+4. Download latest version from GitHub
+5. Replace files and run `pip install -r requirements.txt`
+6. Run `python check.py` to verify dependencies
 
 #### Smart Playlist Mode
 1. **Enable "Smart format matching"** checkbox in playlist options
@@ -358,13 +472,15 @@ The application outputs detailed logs to the console:
 
 ### Components
 
-1. **main.py**: Application entry point, PyQt5 GUI
-2. **api_server.py**: Flask API server for browser communication
-3. **downloader.py**: Download worker with smart format matching
-4. **scheduler.py**: Playlist job scheduling
-5. **settings.py**: Settings persistence
-6. **cache_manager.py**: Metadata caching
-7. **userscript.user.js**: Browser userscript for YouTube integration
+1. **main.py**: Application entry point, PyQt5 GUI, system tray integration, version checking
+2. **api_server.py**: Flask API server for browser communication with comprehensive endpoints
+3. **downloader.py**: Download worker with smart format matching, history and statistics tracking
+4. **scheduler.py**: Playlist job scheduling with automatic download triggering
+5. **settings.py**: Settings persistence and configuration management
+6. **cache_manager.py**: Metadata caching with expiry management and auto-cleanup
+7. **check.py**: Dependency verification with PyQt compatibility testing and auto-update for yt-dlp
+8. **requirements.py**: Automatic dependency installer for complete environment setup
+9. **userscript.user.js**: Browser userscript for YouTube integration (v1.0.0)
 
 ### Data Flow
 
@@ -426,6 +542,7 @@ The application can be customized by modifying the source code:
 - Change API port in `api_server.py`
 - Adjust format ID mappings in `downloader.py`
 - Modify smart matching algorithm in `downloader.py`
+- Update version constant in `main.py`
 
 ### API Endpoints
 
@@ -433,10 +550,25 @@ The application can be customized by modifying the source code:
 - `POST /api/playlist-metadata` - Fetch playlist metadata
 - `POST /api/enqueue` - Queue download job
 - `POST /api/cancel` - Cancel download job
-- `GET /api/jobs` - Get job status
+- `GET /api/status` - Get all job statuses
+- `POST /api/reorder-queue` - Reorder jobs in download queue
+- `GET /api/history` - Get download history
+- `POST /api/history/clear` - Clear download history
+- `GET /api/statistics` - Get download statistics
 - `POST /api/folder-dialog` - Request native folder picker
+- `GET /api/file-dialog-result` - Get file dialog result
+- `POST /api/file-dialog` - Request native file dialog
+- `POST /api/tray-icon-upload` - Upload custom tray icon
 - `GET /api/settings` - Get settings
 - `POST /api/settings` - Save settings
+- `GET /api/schedules` - Get scheduled playlist downloads
+- `POST /api/schedules` - Add scheduled playlist download
+- `DELETE /api/schedules/<playlist_url>` - Remove scheduled playlist download
+- `POST /api/schedules/<playlist_url>/toggle` - Enable/disable scheduled playlist download
+- `GET /api/cache/expiry` - Get cache expiry setting
+- `POST /api/cache/expiry` - Set cache expiry in days
+- `POST /api/cache/clear` - Clear all cached metadata
+- `POST /api/cache/cleanup` - Remove expired cache entries
 - `POST /api/archive/read` - Read downloaded.txt file with enriched metadata
 - `POST /api/archive/remove` - Remove entries from downloaded.txt file
 - `POST /api/archive/metadata` - Save video metadata to centralized database
@@ -518,23 +650,23 @@ Community contributions are welcome! If you encounter issues:
 
 ## Version History
 
-## Version History
-
-### Current Version
-- Archive Editor: Edit downloaded.txt files with centralized metadata database
-- Thumbnail Options: Download thumbnail only, embed in audio, or download as separate file
-- Disable Archive Option: Allow re-downloads by skipping archive file creation
-- Custom Arguments: Advanced mode support for custom yt-dlp arguments
-- Quick Shutdown Toggle: Accessible shutdown button in console header
-- Compact JSON Format: Settings and cache saved in single-line format for easier manual inspection
-- Smart playlist format matching
-- Custom audio format selection
-- Advanced stream sorting
-- Improved error handling
-- Enhanced progress display
-- Deno-first yt-dlp JavaScript runtime detection
-- Draggable, persistently positioned browser HUD
-- Hide/show support with OrangeMonkey menu commands
+### Version 1.0.0 (Current)
+- **Core Features**: Advanced YouTube video downloader with playlist support
+- **Version Checking**: GitHub API integration for automatic update checking
+- **Update System**: Check for Updates button in system tray and about dialog
+- **PO Token Support**: Dual PO token libraries (yt-dlp-getpot-wpc, yt-dlp-ejs) for reliability
+- **Metadata Caching**: Smart caching system with configurable expiry for videos and playlists
+- **Download History**: Track all download attempts with timestamps and success/failure status
+- **Download Statistics**: Monitor total downloads, success rate, and data downloaded
+- **Queue Management**: View and reorder download queue with drag-and-drop interface
+- **System Tray**: Enhanced tray icon with status, queue info, and update checking
+- **Archive Editor**: Edit downloaded.txt files with centralized metadata database
+- **Auto-Shutdown**: Application and PC shutdown options when downloads complete
+- **Custom Tray Icon**: Upload custom icons for the system tray
+- **PyQt5/PyQt6 Support**: Automatic compatibility detection and fallback
+- **Dependency Checker**: Built-in verification with auto-update for yt-dlp
+- **MIT License**: Permissive licensing with attribution requirements
+- **Legal Disclaimers**: Comprehensive legal protections for educational/personal use
 
 ### Previous Versions
 - Basic playlist support
