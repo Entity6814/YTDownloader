@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Desktop Downloader Bridge Pro
 // @namespace    http://tampermonkey.net/
-// @version      0.0
+// @version      1.0.0
 // @description  Fully browser-based headless downloader. Settings panel, defaults persistence, native folder picker. No desktop windows.
 // @author       Entity6814 (Vatsal Patel)
 // @license      MIT
