@@ -1,0 +1,9 @@
+PyQt5
+PyQt6
+Flask
+yt-dlp
+yt-dlp-getpot-wpc
+yt-dlp-ejs
+
+# Note: yt-dlp should be kept up to date for best compatibility and features
+# Run: pip install -U yt-dlp to update to the latest version

@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Project specific
+cache/
+*.cache
+.cache/
+metadata_cache.json
+download_history.json
+download_statistics.json
+video_metadata.json
+settings.json
+embedded_settings.json
+downloaded.txt
+*.temp.mp4
+*.temp.*
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# User data
+app_data/
+data/
+*.json.backup
+
+# Backup folders
+* - Copy/
+*-Copy/
