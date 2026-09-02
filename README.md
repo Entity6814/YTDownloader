@@ -192,7 +192,7 @@ pip install --upgrade yt-dlp
 ### Downloading Videos
 
 1. **Navigate to any YouTube video**
-2. **Click the download button** that appears on the video page
+2. **Click the Analyse & Download button** that appears on the video page
 3. **Configure download options:**
    - **Folder**: Choose download location (uses native folder picker)
    - **Format Container**: MP4, MKV, WebM, MP3, WAV, or Original
