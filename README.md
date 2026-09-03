@@ -164,10 +164,11 @@ python main.py
    - Save the downloader panel position and visibility state
 
 4. **System Tray Features**
-   - **Left-click on tray icon**: Shows about dialog with creator info and update button
+   - **Left-click on tray icon**: Shows about dialog with creator info, update button, and user guide
    - **Right-click on tray icon**: Shows context menu with:
      - Current download status
      - Queue information
+     - User Guide (README) - Opens structured README viewer
      - Check for Updates option
      - Exit option
 
@@ -317,20 +318,35 @@ When updates are available:
 5. Replace files and run `pip install -r requirements.txt`
 6. Run `python check.py` to verify dependencies
 
-#### Smart Playlist Mode
+### User Guide
+
+The application includes a built-in README viewer for easy access to documentation:
+
+#### Features
+- **Integrated Documentation**: Access complete README without opening external files
+- **Scrollable Interface**: Easy navigation through long documentation
+- **Monospace Font**: Better readability for code examples and technical content
+- **Error Handling**: Graceful handling if README file is missing or unreadable
+
+#### Access Points
+- **System Tray Menu**: Right-click tray icon → "📖 User Guide (README)"
+- **About Dialog**: Click tray icon → "📖 User Guide (README)" button
+
+#### Benefits
+- **No External File Opening**: No need to manually open README.md in text editor
+- **Always Available**: Documentation accessible directly from the application
+- **Professional Interface**: Clean, scrollable dialog with consistent styling
+- **Quick Reference**: Easy access to installation, usage, and troubleshooting information
+
+## Advanced Usage
+
+### Smart Playlist Mode
 1. **Enable "Smart format matching"** checkbox in playlist options
 2. **Select your preferred format** from the stream selection tabs
 3. **Download playlist** - each video will be analyzed individually:
    - Exact format match if available
    - Closest resolution match if exact unavailable
    - Smart audio format matching for consistent audio quality
-
-#### Playlist Matrix (Advanced)
-1. **Click "🔍 Open Playlist Customizer Matrix"**
-2. **View all playlist videos** with individual quality settings
-3. **Override quality per video** if needed
-4. **Set custom titles** for individual videos
-5. **Save matrix** to apply custom settings
 
 #### Archive Editor (Advanced Mode)
 1. **Click "📝 Archive"** button in the console header
@@ -654,12 +670,13 @@ Community contributions are welcome! If you encounter issues:
 - **Core Features**: Advanced YouTube video downloader with playlist support
 - **Version Checking**: GitHub API integration for automatic update checking
 - **Update System**: Check for Updates button in system tray and about dialog
+- **User Guide**: Built-in README viewer with scrollable interface and monospace font
+- **System Tray**: Enhanced tray icon with left-click about dialog and right-click context menu
 - **PO Token Support**: Dual PO token libraries (yt-dlp-getpot-wpc, yt-dlp-ejs) for reliability
 - **Metadata Caching**: Smart caching system with configurable expiry for videos and playlists
 - **Download History**: Track all download attempts with timestamps and success/failure status
 - **Download Statistics**: Monitor total downloads, success rate, and data downloaded
 - **Queue Management**: View and reorder download queue with drag-and-drop interface
-- **System Tray**: Enhanced tray icon with status, queue info, and update checking
 - **Archive Editor**: Edit downloaded.txt files with centralized metadata database
 - **Auto-Shutdown**: Application and PC shutdown options when downloads complete
 - **Custom Tray Icon**: Upload custom icons for the system tray

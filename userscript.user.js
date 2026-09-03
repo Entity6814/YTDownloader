@@ -968,59 +968,7 @@
       openArchiveEditorModal();
     });
 
-    // Add button listeners with existence checks and error handling
-    setTimeout(() => {
-      const queueBtn = document.getElementById("yt-btn-queue-manager");
-      if (queueBtn) {
-        queueBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          console.log("[Queue Manager] Button clicked");
-          try {
-            openQueueManagerModal();
-          } catch (err) {
-            console.error("[Queue Manager] Error:", err);
-            alert("Failed to open Queue Manager: " + err.message);
-          }
-        });
-        console.log("[Queue Manager] Event listener attached");
-      } else {
-        console.error("[Queue Manager] Button not found in DOM");
-      }
-
-      const historyBtn = document.getElementById("yt-btn-history");
-      if (historyBtn) {
-        historyBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          console.log("[History] Button clicked");
-          try {
-            openHistoryModal();
-          } catch (err) {
-            console.error("[History] Error:", err);
-            alert("Failed to open History: " + err.message);
-          }
-        });
-        console.log("[History] Event listener attached");
-      } else {
-        console.error("[History] Button not found in DOM");
-      }
-
-      const statsBtn = document.getElementById("yt-btn-statistics");
-      if (statsBtn) {
-        statsBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          console.log("[Statistics] Button clicked");
-          try {
-            openStatisticsModal();
-          } catch (err) {
-            console.error("[Statistics] Error:", err);
-            alert("Failed to open Statistics: " + err.message);
-          }
-        });
-        console.log("[Statistics] Event listener attached");
-      } else {
-        console.error("[Statistics] Button not found in DOM");
-      }
-    }, 100); // Small delay to ensure DOM is ready
+    // Queue Manager, History, and Statistics event listeners will be attached after function definitions
 
     // Load prefs on first inject
     loadSavedPrefs(() => {
@@ -3458,6 +3406,63 @@
         `;
       }
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // ATTACH EVENT LISTENERS FOR ADVANCED MODE BUTTONS
+    // ─────────────────────────────────────────────────────────────────────────
+    // Attach event listeners after all functions are defined to avoid "is not defined" errors
+    setTimeout(() => {
+      const queueBtn = document.getElementById("yt-btn-queue-manager");
+      if (queueBtn) {
+        queueBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          console.log("[Queue Manager] Button clicked");
+          try {
+            openQueueManagerModal();
+          } catch (err) {
+            console.error("[Queue Manager] Error:", err);
+            alert("Failed to open Queue Manager: " + err.message);
+          }
+        });
+        console.log("[Queue Manager] Event listener attached");
+      } else {
+        console.error("[Queue Manager] Button not found in DOM");
+      }
+
+      const historyBtn = document.getElementById("yt-btn-history");
+      if (historyBtn) {
+        historyBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          console.log("[History] Button clicked");
+          try {
+            openHistoryModal();
+          } catch (err) {
+            console.error("[History] Error:", err);
+            alert("Failed to open History: " + err.message);
+          }
+        });
+        console.log("[History] Event listener attached");
+      } else {
+        console.error("[History] Button not found in DOM");
+      }
+
+      const statsBtn = document.getElementById("yt-btn-statistics");
+      if (statsBtn) {
+        statsBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          console.log("[Statistics] Button clicked");
+          try {
+            openStatisticsModal();
+          } catch (err) {
+            console.error("[Statistics] Error:", err);
+            alert("Failed to open Statistics: " + err.message);
+          }
+        });
+        console.log("[Statistics] Event listener attached");
+      } else {
+        console.error("[Statistics] Button not found in DOM");
+      }
+    }, 500); // Delay to ensure DOM is ready and functions are defined
 
     // Stream sorting functionality
     function sortStreams(sortBy) {

@@ -34,12 +34,12 @@ except Exception as e:
 # Import ONLY the detected PyQt variant
 if PYQT_VARIANT == 'PyQt5':
     from PyQt5.QtCore import QObject, pyqtSlot, Qt
-    from PyQt5.QtWidgets import QApplication, QFileDialog, QSystemTrayIcon, QMenu, QAction, QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QGroupBox, QMessageBox, QDialog
+    from PyQt5.QtWidgets import QApplication, QFileDialog, QSystemTrayIcon, QMenu, QAction, QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QGroupBox, QMessageBox, QDialog, QTextEdit, QScrollArea
     from PyQt5.QtGui import QIcon, QCursor
     PYQT_VERSION = 5
 else:  # PyQt6
     from PyQt6.QtCore import QObject, pyqtSlot, Qt
-    from PyQt6.QtWidgets import QApplication, QFileDialog, QSystemTrayIcon, QMenu, QAction, QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QGroupBox, QMessageBox, QDialog
+    from PyQt6.QtWidgets import QApplication, QFileDialog, QSystemTrayIcon, QMenu, QAction, QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QGroupBox, QMessageBox, QDialog, QTextEdit, QScrollArea
     from PyQt6.QtGui import QIcon, QCursor
     PYQT_VERSION = 6
 
@@ -275,6 +275,57 @@ class HeadlessDownloaderApp(QObject):
         else:
             from PyQt6.QtWidgets import QMessageBox
         QMessageBox.information(None, title, message)
+
+    def show_readme_dialog(self):
+        """Show README.md in a structured dialog for easy user reference."""
+        # Get the README.md file path
+        app_dir = os.path.dirname(os.path.abspath(__file__))
+        readme_path = os.path.join(app_dir, 'README.md')
+
+        if not os.path.exists(readme_path):
+            self.show_error_dialog("README Not Found", f"Could not find README.md at {readme_path}")
+            return
+
+        # Read the README content
+        try:
+            with open(readme_path, 'r', encoding='utf-8') as f:
+                readme_content = f.read()
+        except Exception as e:
+            self.show_error_dialog("Read Error", f"Could not read README.md: {e}")
+            return
+
+        # Create a dialog window
+        dialog = QDialog()
+        dialog.setWindowTitle("YouTube Desktop Downloader Bridge Pro - User Guide")
+        dialog.setMinimumSize(900, 700)
+
+        # Create main layout
+        layout = QVBoxLayout(dialog)
+
+        # Create scroll area for the content
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+
+        # Create text edit for displaying README
+        text_edit = QTextEdit()
+        text_edit.setReadOnly(True)
+        text_edit.setPlainText(readme_content)
+
+        # Set a monospace font for better readability
+        font = text_edit.font()
+        font.setFamily("Consolas" if os.name == 'nt' else "Monospace")
+        font.setPointSize(10)
+        text_edit.setFont(font)
+
+        scroll.setWidget(text_edit)
+        layout.addWidget(scroll)
+
+        # Add close button
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(dialog.accept)
+        layout.addWidget(close_button)
+
+        dialog.exec_()
 
     def shutdown(self):
         print("Shutting down background service threads...")
@@ -664,14 +715,19 @@ class HeadlessDownloaderApp(QObject):
         self.tray_menu.addAction(self.queue_action)
         
         self.tray_menu.addSeparator()
-        
+
+        # User Guide action
+        guide_action = QAction("📖 User Guide (README)", self.tray_menu)
+        guide_action.triggered.connect(self.show_readme_dialog)
+        self.tray_menu.addAction(guide_action)
+
         # Check for updates action
         update_action = QAction("🔄 Check for Updates", self.tray_menu)
         update_action.triggered.connect(self.show_update_dialog)
         self.tray_menu.addAction(update_action)
-        
+
         self.tray_menu.addSeparator()
-        
+
         # Exit action
         exit_action = QAction("🚪 Exit", self.tray_menu)
         exit_action.triggered.connect(self.quit_application)
@@ -826,8 +882,16 @@ class HeadlessDownloaderApp(QObject):
 
     def on_tray_icon_activated(self, reason):
         """Handle tray icon activation to show about dialog on left click."""
-        # Trigger = 1 (left click), DoubleClick = 2 (double click)
-        if reason == 1 or reason == 2:
+        # Only respond to left click (Trigger) and double click
+        # Right click (Context) shows the context menu automatically
+        if PYQT_VERSION == 5:
+            from PyQt5.QtWidgets import QSystemTrayIcon
+            activation_reasons = [QSystemTrayIcon.Trigger, QSystemTrayIcon.DoubleClick]
+        else:
+            from PyQt6.QtWidgets import QSystemTrayIcon
+            activation_reasons = [QSystemTrayIcon.ActivationReason.Trigger, QSystemTrayIcon.ActivationReason.DoubleClick]
+
+        if reason in activation_reasons:
             self.show_about_dialog()
 
     def show_about_dialog(self):
@@ -861,18 +925,28 @@ class HeadlessDownloaderApp(QObject):
         dialog = QDialog()
         dialog.setWindowTitle("About YouTube Desktop Downloader")
         dialog.setMinimumWidth(450)
-        
+
         layout = QVBoxLayout()
-        
+
         info_label = QLabel(about_text)
         info_label.setWordWrap(True)
         info_label.setTextFormat(Qt.RichText)
         layout.addWidget(info_label)
-        
-        # Add update button
+
+        # Add buttons
+        button_layout = QVBoxLayout()
+
+        # Update button
         update_button = QPushButton("🔄 Check for Updates")
         update_button.clicked.connect(lambda: [dialog.close(), self.show_update_dialog()])
-        layout.addWidget(update_button)
+        button_layout.addWidget(update_button)
+
+        # User Guide button
+        guide_button = QPushButton("📖 User Guide (README)")
+        guide_button.clicked.connect(lambda: [dialog.close(), self.show_readme_dialog()])
+        button_layout.addWidget(guide_button)
+
+        layout.addLayout(button_layout)
         
         # Add close button
         close_button = QPushButton("Close")
